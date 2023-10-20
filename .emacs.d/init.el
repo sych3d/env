@@ -1,9 +1,16 @@
 (setq inhibit-startup-message t)
 
+(setq undo-limit 40000000)
+(setq undo-strong-limit 100000000)
+
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "khaki4")
+
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
+(setq-default scroll-preserve-screen-position t)
 
 (menu-bar-mode -1)            ; Disable the menu bar
 
@@ -11,6 +18,11 @@
 (setq visible-bell t)
 
 ;(set-face-attribute 'default nil :font "Fira Code Retina" :height 280)
+
+;; (defun noop-split-window nil)
+;; (setq split-window-preferred-function 'noop-split-window)
+;; (split-window-horizontally)             
+
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -77,7 +89,7 @@
 
 (use-package doom-themes
   :config
-  (load-theme 'doom-zenburn t)
+  (load-theme 'doom-molokai t)
 )
 
 
@@ -89,8 +101,8 @@
   ("C-c p" . projectile-command-map)
   :init
   ;; NOTE: Set this to the folder where you keep your Git repos!
-  (when (file-directory-p "/storage1/lenny/workspace")
-    (setq projectile-project-search-path '("/storage1/lenny/workspace")))
+  (when (file-directory-p "~/workspace")
+    (setq projectile-project-search-path '("~/workspace")))
   (setq projectile-switch-project-action #'projectile-dired))
 
 (use-package counsel-projectile
@@ -99,11 +111,78 @@
 ; indentation
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
-(setq c-default-style "k&r")
 
-(require 'cc-mode)
-(add-to-list 'c-mode-common-hook
-  (lambda () (setq c-syntactic-indentation nil)))
+(setq-default c-basic-offset 2)
+(setq-default c-elecric-flag t)
+(setq-default c-tab-always-indent t)
+;(setq-default c-syntactic-indentation nil)
+
+;; Create my personal style.
+(defconst my-c-style
+  '((c-tab-always-indent        . t)
+    (c-comment-only-line-offset . 0)
+    (c-basic-offset . 2)
+    ;; (c-hanging-braces-alist     . ((substatement-open after)
+    ;;                                (brace-list-open)))
+    ;; (c-hanging-colons-alist     . ((member-init-intro before)
+    ;;                                (inher-intro)
+    ;;                                (case-label after)
+    ;;                                (label after)
+    ;;                                (access-label after)))
+    ;; (c-cleanup-list             . (scope-operator
+    ;;                                empty-defun-braces
+    ;;                                defun-close-semi))
+    (c-offsets-alist            . (
+                                   ;; (arglist-close . c-lineup-arglist)
+                                   (substatement-open . 0)
+                                   (block-open        . 0)
+                                   (arglist-intro     . ++)
+                                   (arglist-close     . 0)
+;                                   (arglist-cont-nonempty . t-intro)
+                                   (label                 . -2)
+                                   ;; (access-label          . -2) 
+                                   ;; (substatement-open     .  0) 
+                                   (statement-case-intro  .  +)
+                                   (statement-block-intro .  +)
+                                   (case-label            .  0)
+                                   ;; (inline-open           .  0)
+                                   ;; (topmost-intro-cont    .  0)
+                                   ;; (knr-argdecl-intro     . -4)
+                                   (brace-list-open       .  0)
+                                   (brace-list-intro      .  2)
+
+                                   ))
+    (c-echo-syntactic-information-p . t)
+    )
+  "My C Programming Style")
+
+(c-add-style "PERSONAL" my-c-style)
+
+(defun my-c-mode-hook ()
+  (c-set-style "PERSONAL")
+
+  )
+
+(add-hook 'c-mode-common-hook 'my-c-mode-hook)
+
+
+(defun my-compilation-mode-hook ()
+  (next-error-follow-minor-mode)
+  )
+
+(add-hook 'compilation-mode-hook 'my-compilation-mode-hook)
+
+
+;(setq-default c-default-style "k&r")
+
+; TODO make a function to configure C mode
+;(define-key c-mode-base-map "\t" 'self-insert-command)
+
+;(electric-indent-mode -1)
+
+;; (require 'cc-mode)
+;; (add-to-list 'c-mode-common-hook
+;;   (lambda () (setq c-syntactic-indentation nil)))
 
 
 
