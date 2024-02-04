@@ -11,13 +11,13 @@
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
 (setq-default scroll-preserve-screen-position t)
-
+(delete-selection-mode 1)
 (menu-bar-mode -1)            ; Disable the menu bar
 
 ;; Set up the visible bell
 (setq visible-bell t)
 
-;(set-face-attribute 'default nil :font "Fira Code Retina" :height 280)
+(set-face-attribute 'default nil :font "UnifontExMono" :height 120)
 
 ;; (defun noop-split-window nil)
 ;; (setq split-window-preferred-function 'noop-split-window)
@@ -144,7 +144,7 @@
                                    ;; (substatement-open     .  0) 
                                    (statement-case-intro  .  +)
                                    (statement-block-intro .  +)
-                                   (case-label            .  0)
+                                   (case-label            .  +)
                                    ;; (inline-open           .  0)
                                    ;; (topmost-intro-cont    .  0)
                                    ;; (knr-argdecl-intro     . -4)
@@ -172,8 +172,59 @@
 
 (add-hook 'compilation-mode-hook 'my-compilation-mode-hook)
 
+(global-set-key (kbd "C-/") 'comment-line)
 
-;(setq-default c-default-style "k&r")
+(load "/home/lenny/workspace/env/.emacs.d/myfuncs")
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Dired
+
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :custom ((dired-listing-switches "-agho --group-directories-first"))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LSP
+
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration t))
+
+(use-package yasnippet)
+(use-package flycheck)
+(use-package dap-mode)
+(use-package company)
+
+
+;; (add-hook 'c-mode-hook 'lsp-deferred)
+;; (add-hook 'c++-mode-hook 'lsp-deferred)
+
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1)  ;; clangd is fast
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+  (require 'dap-cpptools)
+  (yas-global-mode))
+
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
 
 ; TODO make a function to configure C mode
 ;(define-key c-mode-base-map "\t" 'self-insert-command)
@@ -215,7 +266,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(counsel-projectile projectile cmake-mode which-key use-package swiper rainbow-delimiters ivy-rich doom-themes)))
+   '(dired-single dired counsel-projectile projectile cmake-mode which-key use-package swiper rainbow-delimiters ivy-rich doom-themes)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
