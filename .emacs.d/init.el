@@ -1,42 +1,53 @@
 ;; TODO
-;; - completion
-;; - project management
-;; - lsp
-;; - C++ style
-;; - TAB always tabs
+;; - window management
 
 ;; =====================================================================================
 ;; General settings
 
-(setq inhibit-startup-message t)
+(custom-set-variables
+ '(inhibit-startup-message t)
+ ;; Make scroll behavior more normal
+ '(scroll-preserve-screen-position t)
+ '(global-hl-line-mode 1)
+ '(global-display-line-numbers-mode t)
+ '(visible-bell t)
+ '(truncate-lines t)
+
+ '(gc-cons-threshold (* 64 1024 1024))
+
+ '(read-process-output-max (* 8 1024 1024))
+ '(async-shell-command-buffer 'confirm-kill-process)
+
+ '(undo-limit (* 64 1024 1024))
+ '(undo-strong-limit (* 128 1024 1024))
+
+ '(global-auto-revert-mode t)
+ '(auto-revert-use-notify t)
+)
+
 (set-fringe-mode 10)
 (scroll-bar-mode -1)
 ;; (tool-bar-mode -1)
 (tooltip-mode -1)
-;; Make scroll behavior more normal
-(setq-default scroll-preserve-screen-position t)
 ;; Delete selected text with typing or pasting
 (delete-selection-mode 1)
 (menu-bar-mode -1)
-(setq visible-bell t)
-
-(setq undo-limit (* 64 1024 1024))
-(setq undo-strong-limit (* 128 1024 1024))
 
 (column-number-mode)
-(global-display-line-numbers-mode t)
 
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		shell-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+           
 
 ;; =====================================================================================
 ;; Keybindings
 
 (global-set-key (kbd "C-/") 'comment-line)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key [mouse-3] nil)
 
 ;; =====================================================================================
 ;; Package sources
@@ -50,48 +61,76 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(setq use-package-always-ensure t)
+
+(custom-set-variables
+ '(use-package-always-ensure t)
+ )
 
 ;; =====================================================================================
 ;; Completion
-;(setq completion-ignore-case t)
-;(setq completions-sort t)
-(setq completion-styles '(flex))
-
+(custom-set-variables
+ '(completion-ignore-case t)
+ '(completion-styles '(substring))
+ )
 
 ;; =====================================================================================
 ;; Colors
+;; list-colors-display - shows colors
 
-(global-hl-line-mode 1)
+;; (use-package doom-themes
+;;   :config
+;;   (load-theme 'doom-moonlight t)
+;; )
 
-(use-package doom-themes
-  :config
-  (load-theme 'doom-molokai t)
-)
+(add-to-list 'default-frame-alist '(font . "Liberation Mono-10.5"))
+(set-face-attribute 'default nil :font "Liberation Mono-10.5")
 
-;; My theme
-;; (add-to-list 'default-frame-alist '(foreground-color . "ivory2"))
-;; (add-to-list 'default-frame-alist '(background-color . "#101040"))
-;; (add-to-list 'default-frame-alist '(cursor-color . "green yellow"))
+;; (add-to-list 'default-frame-alist '(font . "UnifontExMono"))
+;; (set-face-attribute 'default nil :font "UnifontExMono" :height 100)
 
-;; (set-face-attribute 'font-lock-comment-face nil :foreground "ivory4")
-;; (set-face-attribute 'font-lock-function-name-face nil :foreground "OliveDrab2")
-;; (set-face-attribute 'font-lock-variable-name-face nil :foreground "gold2")
-;; (set-face-attribute 'font-lock-keyword-face nil :foreground "firebrick1")
-;; (set-face-attribute 'font-lock-type-face nil :foreground "OliveDrab2")
-;; (set-face-attribute 'font-lock-constant-face nil :foreground "gold2")
-;; (set-face-attribute 'font-lock-function-name-face nil :foreground "OliveDrab2")
-;; (set-face-attribute 'font-lock-preprocessor-face nil :foreground "gold1" :weight 'bold)
-;; (set-face-attribute 'font-lock-string-face nil :foreground "gold2")
-;; (set-face-attribute 'font-lock-punctuation-face nil :foreground "magenta2")
-;; (set-face-attribute 'font-lock-regexp-grouping-backslash nil :foreground "gold1" :weight 'bold)
-;; (set-face-attribute 'font-lock-number-face nil :foreground "ivory2")
-;; (set-face-attribute 'font-lock-operator-face nil :foreground "ivory2")
+(add-to-list 'default-frame-alist '(foreground-color . "grey90"))
+(add-to-list 'default-frame-alist '(background-color . "midnight blue"))
+(add-to-list 'default-frame-alist '(cursor-color . "green2"))
 
-(set-face-background 'hl-line "#203550")
+(set-face-attribute 'font-lock-keyword-face nil :foreground "grey100" :weight 'bold)
+(set-face-attribute 'font-lock-preprocessor-face nil :foreground "yellow" :weight 'bold)
 
-(add-to-list 'default-frame-alist '(font . "UnifontExMono"))
-(set-face-attribute 'default nil :font "UnifontExMono" :height 110)
+(set-face-attribute 'font-lock-comment-face nil :foreground "grey64")
+(set-face-attribute 'font-lock-doc-face nil :foreground "grey64")
+
+(set-face-attribute 'font-lock-function-name-face nil :foreground "LightGoldenrod1")
+(set-face-attribute 'font-lock-variable-name-face nil :foreground "LightGoldenrod1")
+(set-face-attribute 'font-lock-type-face nil :foreground "LightGoldenrod1")
+(set-face-attribute 'font-lock-punctuation-face nil :foreground "grey80")
+(set-face-attribute 'font-lock-operator-face nil :foreground "grey90")
+(set-face-attribute 'font-lock-regexp-grouping-backslash nil :foreground "grey100" :weight 'bold)
+
+(set-face-attribute 'font-lock-constant-face nil :foreground "LightGoldenrod1")
+(set-face-attribute 'font-lock-string-face nil :foreground "khaki")
+(set-face-attribute 'font-lock-number-face nil :foreground "LightGoldenrod1")
+
+(set-face-attribute 'line-number nil :foreground "grey90")
+(set-face-attribute 'line-number-current-line nil :foreground "grey100" :weight 'bold)
+
+(set-face-attribute 'mode-line nil :foreground "grey90" :background "grey32")
+(set-face-attribute 'mode-line-inactive nil :background "grey16")
+(set-face-attribute 'region nil :background "grey32")
+
+;; (add-to-list 'default-frame-alist '(font . "Liberation Mono-11.5"))
+;; (set-face-attribute 'default t :font "Liberation Mono-11.5")
+;; (set-face-attribute 'font-lock-builtin-face nil :foreground "#DAB98F")
+;; (set-face-attribute 'font-lock-comment-face nil :foreground "gray50")
+;; (set-face-attribute 'font-lock-constant-face nil :foreground "olive drab")
+;; (set-face-attribute 'font-lock-doc-face nil :foreground "gray50")
+;; (set-face-attribute 'font-lock-function-name-face nil :foreground "burlywood3")
+;; (set-face-attribute 'font-lock-keyword-face nil :foreground "DarkGoldenrod3")
+;; (set-face-attribute 'font-lock-string-face nil :foreground "olive drab")
+;; (set-face-attribute 'font-lock-type-face nil :foreground "burlywood3")
+;; (set-face-attribute 'font-lock-variable-name-face nil :foreground "burlywood3")
+
+
+(set-face-background 'hl-line "#303030")
+
 
 ;; =====================================================================================
 ;; Dired
@@ -106,12 +145,14 @@
 ;; =====================================================================================
 ;; Indentation
 
-(setq-default tab-width 2)
-(setq-default indent-tabs-mode nil)
+(custom-set-variables
+ '(setq-default tab-width 2)
+ '(setq-default indent-tabs-mode nil)
+ '(setq-default tab-always-indent nil)
+)
 
 
 ;; =====================================================================================
-
 ;; Optional packages
 
 (use-package diminish)
@@ -122,100 +163,55 @@
   :config
   (setq which-key-idle-delay 0.5))
 
-;; (use-package swiper)
+;; =====================================================================================
+;; Customization
 
-;; (use-package ivy
-;;   :diminish
-;;   :bind (("C-s" . swiper)
-;;          :map ivy-minibuffer-map
-;;          ("TAB" . ivy-alt-done)	
-;;          ("C-l" . ivy-alt-done)
-;;          ("C-j" . ivy-next-line)
-;;          ("C-k" . ivy-previous-line)
-;;          :map ivy-switch-buffer-map
-;;          ("C-k" . ivy-previous-line)
-;;          ("C-l" . ivy-done)
-;;          ("C-d" . ivy-switch-buffer-kill)
-;;          :map ivy-reverse-i-search-map
-;;          ("C-k" . ivy-previous-line)
-;;          ("C-d" . ivy-reverse-i-search-kill))
-;;   :config
-;;   (ivy-mode 1))
-
-;; (use-package rainbow-delimiters
-;;   :hook (prog-mode . rainbow-delimiters-mode))
+(defun my-backward-kill-word ()
+  (interactive)
+  (cond 
+   ((looking-back (rx (char word)) 1)
+    (backward-kill-word 1))
+   ((looking-back (rx (char blank)) 1)
+    (delete-horizontal-space t))
+   (t
+    (backward-delete-char 1))))
 
 
+(defun my-kill-word ()
+  (interactive)
+  (cond 
+   ((looking-at (rx (char word)) 1)
+    (kill-word 1))
+   ((looking-at (rx (char blank)) 1)
+    (delete-horizontal-space nil))
+   (t
+    (delete-char 1))))
 
 
-;; (use-package projectile
-;;   :diminish projectile-mode
-;;   :config (projectile-mode)
-;;   :custom ((projectile-completion-system 'ivy))
-;;   :bind-keymap
-;;   ("C-c p" . projectile-command-map)
-;;   :init
-;;   ;; NOTE: Set this to the folder where you keep your Git repos!
-;;   (when (file-directory-p "~/workspace")
-;;     (setq projectile-project-search-path '("~/workspace")))
-;;   (setq projectile-switch-project-action #'projectile-dired))
+(defun my-home (arg)
+  (interactive "^p")
+  (message "my home")
+  (if (= (current-column) 0)
+      (back-to-indentation)
+     (move-beginning-of-line arg)
+    )
+  )
 
-;; (use-package counsel-projectile
-;;   :config (counsel-projectile-mode))
+(defun my-split-window (arg)
+  (let ((all-windows (window-list nil 0)))
+    (if (<= (length all-windows)  1)
+	(split-window-horizontally)
+      )
+    )
+  )
 
+(setq split-window-preferred-function 'my-split-window)
+;; (split-window-horizontally)  
 
-;; (setq-default c-basic-offset 2)
-;; (setq-default c-elecric-flag t)
-;; (setq-default c-tab-always-indent t)
-;; ;(setq-default c-syntactic-indentation nil)
+(global-set-key (kbd "C-<backspace>") 'my-backward-kill-word)
+(global-set-key (kbd "C-<delete>") 'my-kill-word)
+(global-set-key (kbd "<home>") 'my-home)
 
-;; ;; Create my personal style.
-;; (defconst my-c-style
-;;   '((c-tab-always-indent        . t)
-;;     (c-comment-only-line-offset . 0)
-;;     (c-basic-offset . 2)
-;;     ;; (c-hanging-braces-alist     . ((substatement-open after)
-;;     ;;                                (brace-list-open)))
-;;     ;; (c-hanging-colons-alist     . ((member-init-intro before)
-;;     ;;                                (inher-intro)
-;;     ;;                                (case-label after)
-;;     ;;                                (label after)
-;;     ;;                                (access-label after)))
-;;     ;; (c-cleanup-list             . (scope-operator
-;;     ;;                                empty-defun-braces
-;;     ;;                                defun-close-semi))
-;;     (c-offsets-alist            . (
-;;                                    ;; (arglist-close . c-lineup-arglist)
-;;                                    (substatement-open . 0)
-;;                                    (block-open        . 0)
-;;                                    (arglist-intro     . ++)
-;;                                    (arglist-close     . 0)
-;; ;                                   (arglist-cont-nonempty . t-intro)
-;;                                    (label                 . -2)
-;;                                    ;; (access-label          . -2) 
-;;                                    ;; (substatement-open     .  0) 
-;;                                    (statement-case-intro  .  +)
-;;                                    (statement-block-intro .  +)
-;;                                    (case-label            .  +)
-;;                                    ;; (inline-open           .  0)
-;;                                    ;; (topmost-intro-cont    .  0)
-;;                                    ;; (knr-argdecl-intro     . -4)
-;;                                    (brace-list-open       .  0)
-;;                                    (brace-list-intro      .  2)
-
-;;                                    ))
-;;     (c-echo-syntactic-information-p . t)
-;;     )
-;;   "My C Programming Style")
-
-;; (c-add-style "PERSONAL" my-c-style)
-
-;; (defun my-c-mode-hook ()
-;;   (c-set-style "PERSONAL")
-
-;;   )
-
-;; (add-hook 'c-mode-common-hook 'my-c-mode-hook)
 
 
 ;; (defun my-compilation-mode-hook ()
@@ -225,100 +221,142 @@
 ;; (add-hook 'compilation-mode-hook 'my-compilation-mode-hook)
 
 
-;; (load "/home/lenny/workspace/env/.emacs.d/myfuncs")
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LSP
 
+(use-package eglot
+  :custom
+  (eglot-events-buffer-size 0)
+  (eglot-autoshutdown t)
+  (eglot-send-changes-idle-time 1)
+  (flymake-no-changes-timeout 3)
+  :config
+  (setq eglot-report-progress nil)
+  (add-to-list 'eglot-stay-out-of 'eldoc)
+  )
 
-;; (use-package lsp-mode
-;;   :commands (lsp lsp-deferred)
-;;   :init
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :config
-;;   (lsp-enable-which-key-integration t))
+(use-package company
+  :config
+  (setq company-idle-delay 0.5)
+  (setq company-minimum-prefix-length 1)
+  )
 
-;; (use-package yasnippet)
-;; (use-package flycheck)
-;; (use-package dap-mode)
-;; (use-package company)
-
-
-;; ;; (add-hook 'c-mode-hook 'lsp-deferred)
-;; ;; (add-hook 'c++-mode-hook 'lsp-deferred)
-
-;; (add-hook 'c-mode-hook 'lsp)
-;; (add-hook 'c++-mode-hook 'lsp)
-
-;; (setq gc-cons-threshold (* 100 1024 1024)
-;;       read-process-output-max (* 1024 1024)
-;;       treemacs-space-between-root-nodes nil
-;;       company-idle-delay 0.0
-;;       company-minimum-prefix-length 1
-;;       lsp-idle-delay 0.1)  ;; clangd is fast
-
-;; (with-eval-after-load 'lsp-mode
-;;   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-;;   (require 'dap-cpptools)
-;;   (yas-global-mode))
-
-;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-
-; TODO make a function to configure C mode
-;(define-key c-mode-base-map "\t" 'self-insert-command)
-
-;(electric-indent-mode -1)
-
-;; (require 'cc-mode)
-;; (add-to-list 'c-mode-common-hook
-;;   (lambda () (setq c-syntactic-indentation nil)))
-
-
-
-;(use-package councel
-;  :bind (("M-x" . councel-M-x)
-;	 ("C-x b" . councel-ibuffer)
-;	 ("C-x C-f" . councel-find-file)
-;	 :map minibuffer-local-map
-;	 ("C-r" . 'councel-minibuffer-history))
-;  :config
-;  (setq ivy-initial-inputs-alist nil))
-
-
-;(use-package ivy-rich
-;  :init
-;  (ivy-rich-mode 1))
-
-;(use-package councel
-;  :bind (("M-x" . councel-M-x)
-;	 ("C-x b" . councel-ibuffer)
-;	 ("C-x C-f" . councel-find-file)
-;	 :map minibuffer-local-map
-;	 ("C-r" . 'councel-minibuffer-history))
-;  :config
-;  (setq ivy-initial-inputs-alist nil))
-
-;; ;; (defun noop-split-window nil)
-;; ;; (setq split-window-preferred-function 'noop-split-window)
-;; ;; (split-window-horizontally)             
 
 ;; =====================================================================================
+;; C-mode
+
+;; Create my personal style.
+(defconst my-c-style
+  '((c-tab-always-indent . t)
+    (c-basic-offset . 2)
+    (c-elecric-flag . t)
+    (c-echo-syntactic-information-p . t)
+    (c-offsets-alist            . (
+                                   (innamespace . +)
+                                   (defun-block-intro . +)
+                                   (block-open        . 0)
+                                   (arglist-intro     . ++)
+                                   (arglist-close     . 0)
+                                   (label                 . -2)
+                                   (statement-case-intro  .  +)
+                                   (statement-block-intro .  +)
+                                   (case-label            .  +)
+                                   (brace-list-open       .  0)
+                                   (brace-list-intro      .  +)
+                                   )
+                                ))
+  "My C Programming Style")
+(c-add-style "PERSONAL" my-c-style)
+
+(defun my-check-file-name-exts (file-name exts)
+  (let ((result)
+        (file-ext (downcase (file-name-extension file-name)))
+        )
+    (dolist (ext exts result)
+      (if (string= file-ext ext)
+          (setq result t)))
+    result))
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(dired-single dired counsel-projectile projectile cmake-mode which-key use-package swiper rainbow-delimiters ivy-rich doom-themes)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(defun my-c-header-p (file-name)
+  (my-check-file-name-exts file-name '("h" "hh" "hpp")))
+
+(defun my-c-src-p (file-name)
+  (my-check-file-name-exts file-name '("c" "cc" "cpp")))
+
+(defun my-replace-ext (file-name new-ext)
+  (concat (file-name-sans-extension file-name) "." new-ext)
+  )
+
+(defun my-c-get-other-file-name (file-name)
+  (let ((candidate-extensions '())
+        (result)
+        )
+    (pcase file-name
+      ((pred my-c-header-p) (setq candidate-extensions '("cpp" "cc" "c" "C")))
+      ((pred my-c-src-p) (setq candidate-extensions '("h" "hh" "hpp"))))
+     (dolist (candidate-extension candidate-extensions result)
+       (let ((candidate-file-name (my-replace-ext file-name candidate-extension)))
+         (if (file-exists-p candidate-file-name)
+             (setq result candidate-file-name)
+           )
+         )
+      )
+    result
+    )
+  )
+
+(defun my-c-find-other-file ()
+  (interactive)
+  (let ((other-file-name (my-c-get-other-file-name buffer-file-name)))
+        (if other-file-name
+            (find-file other-file-name)
+          )))
+
+(defun my-find-file-rec (dir file-name)
+  (if dir
+      (let ((full-file-name (concat (file-name-as-directory dir) file-name))
+            (next-dir (file-name-directory (directory-file-name dir))))
+        (if (file-exists-p full-file-name)
+            full-file-name
+          (if (not (string= dir next-dir))
+              (my-find-file-rec next-dir file-name)
+            nil
+            )
+          )
+        )
+    nil
+    )
+  )
+
+(defun my-build ()
+  (interactive)
+  
+  (let ((build-script-path (my-find-file-rec (file-name-directory buffer-file-name) "ll_build.sh")))
+    (if build-script-path
+        (let ((default-directory (file-name-directory build-script-path))) 
+          (compile build-script-path))
+      )
+    )
+  )
+
+(defun my-run ()
+  (interactive)
+  
+  (let ((run-script-path (my-find-file-rec (file-name-directory buffer-file-name) "ll_run.sh")))
+    (if run-script-path
+        (async-shell-command run-script-path "ll-run"))
+    )
+  )
+
+(defun my-c-mode-common-hook ()
+  (c-set-style "PERSONAL")
+  (local-set-key (kbd "C-c k o") 'my-c-find-other-file)
+  (local-set-key (kbd "C-b") 'my-build)
+  (local-set-key (kbd "<f5>") 'my-run)
+  (eglot-ensure)
+  (company-mode 1)
+  )
+
+(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
