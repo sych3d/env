@@ -5,25 +5,28 @@
 ;; General settings
 
 (custom-set-variables
- '(inhibit-startup-message t)
- ;; Make scroll behavior more normal
- '(scroll-preserve-screen-position t)
- '(global-hl-line-mode 1)
- '(global-display-line-numbers-mode t)
- '(visible-bell t)
- '(truncate-lines t)
-
- '(gc-cons-threshold (* 64 1024 1024))
-
- '(read-process-output-max (* 8 1024 1024))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(async-shell-command-buffer 'confirm-kill-process)
-
+ '(auto-revert-use-notify t)
+ '(completion-ignore-case t)
+ '(completion-styles '(substring))
+ '(gc-cons-threshold (* 64 1024 1024))
+ '(global-auto-revert-mode t)
+ '(global-display-line-numbers-mode t)
+ '(global-hl-line-mode 1)
+ '(inhibit-startup-screen t)
+ '(package-selected-packages '(company which-key diminish))
+ '(read-process-output-max (* 8 1024 1024) t)
+ '(scroll-preserve-screen-position t)
+ '(setq-default tab-always-indent)
+ '(truncate-lines t)
  '(undo-limit (* 64 1024 1024))
  '(undo-strong-limit (* 128 1024 1024))
-
- '(global-auto-revert-mode t)
- '(auto-revert-use-notify t)
-)
+ '(use-package-always-ensure t)
+ '(visible-bell t))
 
 (set-fringe-mode 10)
 (scroll-bar-mode -1)
@@ -41,7 +44,10 @@
 		shell-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
-           
+
+
+(dolist (mode '(compilation-mode-hook))
+  (add-hook mode (lambda () (custom-set-variables '(truncate-lines nil)))))
 
 ;; =====================================================================================
 ;; Keybindings
@@ -63,16 +69,11 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-(custom-set-variables
- '(use-package-always-ensure t)
- )
+
 
 ;; =====================================================================================
 ;; Completion
-(custom-set-variables
- '(completion-ignore-case t)
- '(completion-styles '(substring))
- )
+
 
 ;; =====================================================================================
 ;; Colors
@@ -83,8 +84,8 @@
 ;;   (load-theme 'doom-moonlight t)
 ;; )
 
-(add-to-list 'default-frame-alist '(font . "Liberation Mono-10.5"))
-(set-face-attribute 'default nil :font "Liberation Mono-10.5")
+(add-to-list 'default-frame-alist '(font . "Liberation Mono-12"))
+(set-face-attribute 'default nil :font "Liberation Mono-12")
 
 ;; (add-to-list 'default-frame-alist '(font . "UnifontExMono"))
 ;; (set-face-attribute 'default nil :font "UnifontExMono" :height 100)
@@ -146,11 +147,7 @@
 ;; =====================================================================================
 ;; Indentation
 
-(custom-set-variables
- '(setq-default tab-width 2)
- '(setq-default indent-tabs-mode nil)
- '(setq-default tab-always-indent nil)
-)
+
 
 
 ;; =====================================================================================
@@ -361,3 +358,9 @@
   )
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
