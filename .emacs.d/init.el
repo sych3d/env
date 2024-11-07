@@ -4,29 +4,28 @@
 ;; =====================================================================================
 ;; General settings
 
+(setq custom-file "~/.emacs.d/custom.el")
+
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(async-shell-command-buffer 'confirm-kill-process)
- '(auto-revert-use-notify t)
- '(completion-ignore-case t)
- '(completion-styles '(substring))
- '(gc-cons-threshold (* 64 1024 1024))
- '(global-auto-revert-mode t)
- '(global-display-line-numbers-mode t)
- '(global-hl-line-mode 1)
- '(inhibit-startup-screen t)
- '(package-selected-packages '(company which-key diminish))
- '(read-process-output-max (* 8 1024 1024) t)
+ '(inhibit-startup-message t)
+ ;; Make scroll behavior more normal
  '(scroll-preserve-screen-position t)
- '(setq-default tab-always-indent)
+ '(scroll-error-top-bottom t)
+ '(global-display-line-numbers-mode t)
+ '(visible-bell t)
  '(truncate-lines t)
+
+ '(gc-cons-threshold (* 64 1024 1024))
+
+ '(read-process-output-max (* 8 1024 1024))
+ '(async-shell-command-buffer 'confirm-kill-process)
+
  '(undo-limit (* 64 1024 1024))
  '(undo-strong-limit (* 128 1024 1024))
- '(use-package-always-ensure t)
- '(visible-bell t))
+
+ '(global-auto-revert-mode t)
+ '(auto-revert-use-notify t)
+)
 
 (set-fringe-mode 10)
 (scroll-bar-mode -1)
@@ -45,16 +44,45 @@
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-
 (dolist (mode '(compilation-mode-hook))
-  (add-hook mode (lambda () (custom-set-variables '(truncate-lines nil)))))
+  (add-hook mode (lambda () (custom-set-variables '(truncate-lines nil))))
+  )
+
+;; =====================================================================================
+;; Functions
+
+(defun my-build ()
+  (interactive)
+  
+  (let ((build-script-path (my-find-file-rec (file-name-directory buffer-file-name) "ll_build.sh")))
+    (if build-script-path
+        (let ((default-directory (file-name-directory build-script-path))) 
+          (compile build-script-path))
+      )
+    )
+  )
+
+(defun my-run ()
+  (interactive)
+  
+  (let ((run-script-path (my-find-file-rec (file-name-directory buffer-file-name) "ll_run.sh")))
+    (if run-script-path
+        (async-shell-command run-script-path "ll-run"))
+    )
+  )
+
 
 ;; =====================================================================================
 ;; Keybindings
 
 (global-set-key (kbd "C-/") 'comment-line)
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (global-set-key [mouse-3] nil)
+(global-set-key (kbd "C-/") 'comment-line)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "C-b") 'my-build)
+(global-set-key (kbd "<f5>") 'my-run)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 
 ;; =====================================================================================
 ;; Package sources
@@ -69,11 +97,16 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-
+(custom-set-variables
+ '(use-package-always-ensure t)
+ )
 
 ;; =====================================================================================
 ;; Completion
-
+(custom-set-variables
+ '(completion-ignore-case t)
+ '(completion-styles '(basic substring))
+ )
 
 ;; =====================================================================================
 ;; Colors
@@ -84,55 +117,61 @@
 ;;   (load-theme 'doom-moonlight t)
 ;; )
 
-(add-to-list 'default-frame-alist '(font . "Liberation Mono-12"))
-(set-face-attribute 'default nil :font "Liberation Mono-12")
+(if (display-graphic-p)
+    (progn
+      (custom-set-variables
+       '(global-hl-line-mode 1)
+       )
+      (add-to-list 'default-frame-alist '(font . "Liberation Mono-10.5"))
+      (set-face-attribute 'default nil :font "Liberation Mono-10.5")
 
-;; (add-to-list 'default-frame-alist '(font . "UnifontExMono"))
-;; (set-face-attribute 'default nil :font "UnifontExMono" :height 100)
+      ;; (add-to-list 'default-frame-alist '(font . "UnifontExMono"))
+      ;; (set-face-attribute 'default nil :font "UnifontExMono" :height 100)
 
-(add-to-list 'default-frame-alist '(foreground-color . "grey90"))
-(add-to-list 'default-frame-alist '(background-color . "midnight blue"))
-(add-to-list 'default-frame-alist '(cursor-color . "green2"))
+      (add-to-list 'default-frame-alist '(foreground-color . "grey90"))
+      (add-to-list 'default-frame-alist '(background-color . "midnight blue"))
+      (add-to-list 'default-frame-alist '(cursor-color . "green2"))
 
-(set-face-attribute 'font-lock-keyword-face nil :foreground "grey100" :weight 'bold)
-(set-face-attribute 'font-lock-preprocessor-face nil :foreground "yellow" :weight 'bold)
+      (set-face-attribute 'font-lock-keyword-face nil :foreground "grey100" :weight 'bold)
+      (set-face-attribute 'font-lock-preprocessor-face nil :foreground "yellow" :weight 'bold)
 
-(set-face-attribute 'font-lock-comment-face nil :foreground "grey64")
-(set-face-attribute 'font-lock-doc-face nil :foreground "grey64")
+      (set-face-attribute 'font-lock-comment-face nil :foreground "grey64")
+      (set-face-attribute 'font-lock-doc-face nil :foreground "grey64")
 
-(set-face-attribute 'font-lock-function-name-face nil :foreground "LightGoldenrod1")
-(set-face-attribute 'font-lock-variable-name-face nil :foreground "LightGoldenrod1")
-(set-face-attribute 'font-lock-type-face nil :foreground "LightGoldenrod1")
-(set-face-attribute 'font-lock-punctuation-face nil :foreground "grey80")
-(set-face-attribute 'font-lock-operator-face nil :foreground "grey90")
-(set-face-attribute 'font-lock-regexp-grouping-backslash nil :foreground "grey100" :weight 'bold)
+      (set-face-attribute 'font-lock-function-name-face nil :foreground "LightGoldenrod1")
+      (set-face-attribute 'font-lock-variable-name-face nil :foreground "LightGoldenrod1")
+      (set-face-attribute 'font-lock-type-face nil :foreground "LightGoldenrod1")
+      (set-face-attribute 'font-lock-punctuation-face nil :foreground "grey80")
+      (set-face-attribute 'font-lock-operator-face nil :foreground "grey90")
+      (set-face-attribute 'font-lock-regexp-grouping-backslash nil :foreground "grey100" :weight 'bold)
 
-(set-face-attribute 'font-lock-constant-face nil :foreground "LightGoldenrod1")
-(set-face-attribute 'font-lock-string-face nil :foreground "khaki")
-(set-face-attribute 'font-lock-number-face nil :foreground "LightGoldenrod1")
+      (set-face-attribute 'font-lock-constant-face nil :foreground "LightGoldenrod1")
+      (set-face-attribute 'font-lock-string-face nil :foreground "khaki")
+      (set-face-attribute 'font-lock-number-face nil :foreground "LightGoldenrod1")
 
-(set-face-attribute 'line-number nil :foreground "grey90")
-(set-face-attribute 'line-number-current-line nil :foreground "grey100" :weight 'bold)
+      (set-face-attribute 'line-number nil :foreground "grey90")
+      (set-face-attribute 'line-number-current-line nil :foreground "grey100" :weight 'bold)
 
-(set-face-attribute 'mode-line nil :foreground "grey90" :background "grey32")
-(set-face-attribute 'mode-line-inactive nil :background "grey16")
-(set-face-attribute 'region nil :background "grey32")
+      (set-face-attribute 'mode-line nil :foreground "grey90" :background "grey32")
+      (set-face-attribute 'mode-line-inactive nil :background "grey16")
+      (set-face-attribute 'region nil :background "grey32")
 
-;; (add-to-list 'default-frame-alist '(font . "Liberation Mono-11.5"))
-;; (set-face-attribute 'default t :font "Liberation Mono-11.5")
-;; (set-face-attribute 'font-lock-builtin-face nil :foreground "#DAB98F")
-;; (set-face-attribute 'font-lock-comment-face nil :foreground "gray50")
-;; (set-face-attribute 'font-lock-constant-face nil :foreground "olive drab")
-;; (set-face-attribute 'font-lock-doc-face nil :foreground "gray50")
-;; (set-face-attribute 'font-lock-function-name-face nil :foreground "burlywood3")
-;; (set-face-attribute 'font-lock-keyword-face nil :foreground "DarkGoldenrod3")
-;; (set-face-attribute 'font-lock-string-face nil :foreground "olive drab")
-;; (set-face-attribute 'font-lock-type-face nil :foreground "burlywood3")
-;; (set-face-attribute 'font-lock-variable-name-face nil :foreground "burlywood3")
+      ;; (add-to-list 'default-frame-alist '(font . "Liberation Mono-11.5"))
+      ;; (set-face-attribute 'default t :font "Liberation Mono-11.5")
+      ;; (set-face-attribute 'font-lock-builtin-face nil :foreground "#DAB98F")
+      ;; (set-face-attribute 'font-lock-comment-face nil :foreground "gray50")
+      ;; (set-face-attribute 'font-lock-constant-face nil :foreground "olive drab")
+      ;; (set-face-attribute 'font-lock-doc-face nil :foreground "gray50")
+      ;; (set-face-attribute 'font-lock-function-name-face nil :foreground "burlywood3")
+      ;; (set-face-attribute 'font-lock-keyword-face nil :foreground "DarkGoldenrod3")
+      ;; (set-face-attribute 'font-lock-string-face nil :foreground "olive drab")
+      ;; (set-face-attribute 'font-lock-type-face nil :foreground "burlywood3")
+      ;; (set-face-attribute 'font-lock-variable-name-face nil :foreground "burlywood3")
 
 
-(set-face-background 'hl-line "#303030")
-
+      (set-face-background 'hl-line "#303030")
+      )
+  )
 
 ;; =====================================================================================
 ;; Dired
@@ -147,7 +186,11 @@
 ;; =====================================================================================
 ;; Indentation
 
-
+(custom-set-variables
+ '(tab-width 2)
+ '(indent-tabs-mode nil)
+ '(tab-always-indent nil)
+)
 
 
 ;; =====================================================================================
@@ -232,6 +275,19 @@
   :config
   (setq eglot-report-progress nil)
   (add-to-list 'eglot-stay-out-of 'eldoc)
+  (add-to-list 'eglot-server-programs
+	       '((c-mode c++-mode)
+		 . ("/usr/bin/clangd"
+		    "-j=8"
+		    "--log=error"
+		    "--malloc-trim"
+		    "--background-index"
+		    "--completion-style=detailed"
+		    "--pch-storage=memory"
+		    "--header-insertion=never"
+		    "--header-insertion-decorators=0")
+		 )
+	       )
   )
 
 (use-package company
@@ -328,39 +384,14 @@
     )
   )
 
-(defun my-build ()
-  (interactive)
-  
-  (let ((build-script-path (my-find-file-rec (file-name-directory buffer-file-name) "ll_build.sh")))
-    (if build-script-path
-        (let ((default-directory (file-name-directory build-script-path))) 
-          (compile build-script-path))
-      )
-    )
-  )
-
-(defun my-run ()
-  (interactive)
-  
-  (let ((run-script-path (my-find-file-rec (file-name-directory buffer-file-name) "ll_run.sh")))
-    (if run-script-path
-        (async-shell-command run-script-path "ll-run"))
-    )
-  )
-
 (defun my-c-mode-common-hook ()
   (c-set-style "PERSONAL")
   (local-set-key (kbd "C-c k o") 'my-c-find-other-file)
-  (local-set-key (kbd "C-b") 'my-build)
-  (local-set-key (kbd "<f5>") 'my-run)
+  ;; (local-set-key (kbd "C-b") 'my-build)
+  ;; (local-set-key (kbd "<f5>") 'my-run)
   (eglot-ensure)
   (company-mode 1)
   )
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
