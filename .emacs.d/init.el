@@ -29,7 +29,6 @@
 
 (set-fringe-mode 10)
 (scroll-bar-mode -1)
-;; (tool-bar-mode -1)
 (tooltip-mode -1)
 ;; Delete selected text with typing or pasting
 (delete-selection-mode 1)
@@ -78,9 +77,7 @@
 (global-set-key (kbd "C-/") 'comment-line)
 ;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (global-set-key [mouse-3] nil)
-(global-set-key (kbd "C-/") 'comment-line)
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-(global-set-key (kbd "C-b") 'my-build)
+(global-set-key (kbd "<f9>") 'my-build)
 (global-set-key (kbd "<f5>") 'my-run)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
@@ -254,7 +251,6 @@
 (global-set-key (kbd "<home>") 'my-home)
 
 
-
 ;; (defun my-compilation-mode-hook ()
 ;;   (next-error-follow-minor-mode)
 ;;   )
@@ -277,16 +273,19 @@
   (add-to-list 'eglot-stay-out-of 'eldoc)
   (add-to-list 'eglot-server-programs
 	       '((c-mode c++-mode)
-		 . ("/usr/bin/clangd"
-		    "-j=8"
-		    "--log=error"
-		    "--malloc-trim"
-		    "--background-index"
-		    "--completion-style=detailed"
-		    "--pch-storage=memory"
-		    "--header-insertion=never"
-		    "--header-insertion-decorators=0")
-		 )
+		       . ("/usr/bin/clangd"
+		          "-j=8"
+		          ;; "--log=verbose"
+		          "--log=error"
+		          "--malloc-trim"
+		          "--background-index"
+		          "--completion-style=detailed"
+		          "--pch-storage=memory"
+		          "--header-insertion=never"
+		          "--header-insertion-decorators=0"
+              "--query-driver=\"/usr/bin/g++,/usr/bin/g++-12,/usr/bin/g++-13,/usr/bin/g++-14\""
+              )
+		       )
 	       )
   )
 
